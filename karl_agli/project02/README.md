@@ -29,6 +29,15 @@ python read_html_table.py myfile.html
 ## Requirements
 
 - Python 3.x
+
+## How It Works
+
+The code manually parses HTML by searching for tags using string operations:
+- Finds `<table>` and `</table>` tags to extract tables
+- Finds `<tr>` and `</tr>` tags for rows
+- Finds `<td>` and `<th>` tags for cells
+- Strips remaining HTML tags from cell content
+- No external parser libraries needed - just basic Python string methods
 - Only uses standard library (no pip installs needed)
 
 ## Notes
