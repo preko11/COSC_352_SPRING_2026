@@ -16,19 +16,15 @@ def get_html_content(source):
             response = urllib.request.urlopen(source)
             html = response.read().decode('utf-8')
             return html
-        except:
-            print("Error: couldn't fetch the url")
-            sys.exit(1)
-    else:
+    except Exception as e:            print("Error: couldn't fetch the url")
+        print(f"Error: couldn't fetch the url - {e}")    else:
         # its a file, just read it
         try:
             with open(source, 'r') as f:
                 html = f.read()
             return html
-        except:
-            print("Error: couldn't read the file")
-            sys.exit(1)
-
+    except Exception as e:            print("Error: couldn't read the file")
+        print(f"Error: couldn't read the file - {e}")
 # function to find all tables in html
 def find_tables(html):
     tables = []
@@ -149,7 +145,14 @@ def clean_html(text):
     
     # clean up whitespace
     clean = ' '.join(clean.split())
-    
+
+        # decode common html entities
+    clean = clean.replace('&nbsp;', ' ')
+    clean = clean.replace('&amp;', '&')
+    clean = clean.replace('&lt;', '<')
+    clean = clean.replace('&gt;', '>')
+    clean = clean.replace('&quot;', '"')
+    clean = clean.replace('&#39;', "'")
     return clean.strip()
 
 # main function
