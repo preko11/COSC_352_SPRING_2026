@@ -12,3 +12,4 @@ How to Run
 1. Build Docker Image
 
 docker build -t html_table_parser .
+docker run table-parser https://en.wikipedia.org/wiki/Comparison_of_programming_languages
