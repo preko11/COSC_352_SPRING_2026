@@ -48,13 +48,7 @@ class ProgrammingLanguageParser(html.parser.HTMLParser):
 
         if tag == 'table':
 
-            # On Wikipedia, the programming languages table often has a 'wikitable' class
-
-            # We can try to be a bit more specific if needed, but for now, we'll just
-
             # assume the first significant table we encounter might be it.
-
-            # For this specific Wikipedia page, the target table is usually the first one.
 
             if not self.found_target_table:
 
@@ -159,4 +153,5 @@ class ProgrammingLanguageParser(html.parser.HTMLParser):
         if not self.all_data:
 
             return [], []
+
 
