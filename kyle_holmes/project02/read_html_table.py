@@ -1,3 +1,4 @@
+import csv
 import sys
 import urllib.request
 from html.parser import HTMLParser
@@ -27,6 +28,35 @@ class SimpleTableParser(HTMLParser):
                 self.all_rows.append(self.current_row)
             self.current_row = []
 
+def save_to_csv(data, filename="programming_languages.csv"):
+    if not data:
+        return
+    
+    row_lengths = [len(row) for row in data]
+    if not row_lengths:
+        return
+    
+    most_common_length = max(set(row_lengths), key=row_lengths.count)
+    
+    cleaned_data = []
+    for row in data:
+        if len(row) != most_common_length:
+            continue
+        if all(cell.strip() in ('', ',', '","', '[', ']') for cell in row):
+            continue
+        
+        cleaned_data.append(row)
+    
+    if not cleaned_data:
+        print("No valid data to save after filtering.")
+        return
+
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerows(cleaned_data)
+    
+    print(f"Data successfully saved to {filename} ({len(cleaned_data)} rows)")
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python script.py <URL>")
@@ -34,12 +64,10 @@ if __name__ == "__main__":
 
     url = sys.argv[1]
     
-    # Ensure URL has a scheme (http:// or https://)
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
 
     try:
-        # Some sites block Python; this 'Header' makes us look like a browser
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         
         with urllib.request.urlopen(req) as response:
@@ -48,7 +76,11 @@ if __name__ == "__main__":
         parser = SimpleTableParser()
         parser.feed(raw_html)
 
-        # Let's just print the first 5 rows so we don't flood the terminal
+        if parser.all_rows:
+            save_to_csv(parser.all_rows)
+        else:
+            print("No table data found to save.")
+
         print(f"Successfully found {len(parser.all_rows)} rows of data.")
         for row in parser.all_rows[:5]:
             print(row)
