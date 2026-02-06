@@ -21,11 +21,8 @@ Only **standard Python libraries** are used, as required.
 - `read_html_table.py`  
   Python program that parses HTML tables and outputs a CSV file.
 
-- `csv1/`  
+- `csv\`
   Contains sample CSV files related to the project.
-
-- `csv2/`  
-  Contains additional sample CSV files related to the project.
 
 - `README.md`  
   Instructions and explanation of the project.
