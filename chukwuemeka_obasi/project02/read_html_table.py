@@ -1,79 +1,65 @@
-import sys
 import csv
-import urllib.request
-def read_html(source):
-    if source.startswith("http"):
-        req = urllib.request.Request(
-            source,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode("utf-8")
-    else:
-        with open(source, encoding="utf-8") as f:
-            return f.read()
-from html.parser import HTMLParser
 
+def read_html(filename):
+    f = open(filename, "r", encoding="utf-8")
+    html = f.read()
+    f.close()
+    return html
 
-class SimpleTableParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.in_row = False
-        self.in_cell = False
-        self.row = []
-        self.rows = []
+def parse_table(html):
+    stack = []
+    rows = []
+    row = []
+    cell = ""
+    i = 0
 
-    def handle_starttag(self, tag, attrs):
-        if tag == "tr":
-            self.in_row = True
-            self.row = []
-        elif tag in ("td", "th") and self.in_row:
-            self.in_cell = True
-            self.cell = ""
+    while i < len(html):
+        if html[i] == "<":
+            i += 1
+            tag = ""
 
-    def handle_data(self, data):
-        if self.in_cell:
-            self.cell += data.strip()
+            while html[i] != ">":
+                tag += html[i]
+                i += 1
 
-    def handle_endtag(self, tag):
-        if tag in ("td", "th") and self.in_cell:
-            self.row.append(self.cell)
-            self.in_cell = False
-        elif tag == "tr" and self.in_row:
-            if self.row:
-                self.rows.append(self.row)
-            self.in_row = False
+            tag = tag.strip().lower()
 
+            if tag.startswith("tr"):
+                stack.append("tr")
+                row = []
 
-def read_html(source):
-    if source.startswith("http"):
-        req = urllib.request.Request(
-            source,
-            headers={"User-Agent": "Mozilla/5.0"}
-        )
-        with urllib.request.urlopen(req) as response:
-            return response.read().decode("utf-8")
-    else:
-        with open(source, encoding="utf-8") as f:
-            return f.read()
+            elif tag.startswith("td") or tag.startswith("th"):
+                stack.append("td")
+                cell = ""
 
+            elif tag == "/td" or tag == "/th":
+                if len(stack) > 0 and stack[-1] == "td":
+                    stack.pop()
+                    row.append(cell.strip())
+
+            elif tag == "/tr":
+                if len(stack) > 0 and stack[-1] == "tr":
+                    stack.pop()
+                    if len(row) > 0:
+                        rows.append(row)
+
+        else:
+            if len(stack) > 0 and stack[-1] == "td":
+                cell += html[i]
+
+        i += 1
+
+    return rows
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python read_html_table.py <URL | HTML_FILE>")
-        return
+    html = read_html("ProgrammingLanguages.html")
+    rows = parse_table(html)
 
-    html = read_html(sys.argv[1])
+    out = open("output.csv", "w", newline="", encoding="utf-8")
+    writer = csv.writer(out)
+    writer.writerows(rows)
+    out.close()
 
-    parser = SimpleTableParser()
-    parser.feed(html)
+    print("output.csv created")
 
-    with open("output.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerows(parser.rows)
-
-    print("Saved table data to output.csv")
-
-
-if __name__ == "__main__":
-    main()
+main()
