@@ -1,7 +1,8 @@
 LOG_FILE="grading_results_$(date +%F_%T).log"
 STUDENTS_DIR="./students"
 EXPECTED_OUTPUT="Hello World" 
-PROJECT_TYPE="project01"                 
+PROJECT_TYPE="project01"      
+TIME_LIMIT="10s"               
 
 log_message() {
     local MESSAGE="$1"
