@@ -1,7 +1,11 @@
 #!/bin/bash
 
+#getting variables in order.
+
 PROJECT_DIR=$1
 LOG_FILE="grading_log_$(date +%Y%m%d).txt"
+
+# starting to validate the project directory.
 
 if [ -z "$PROJECT_DIR" ]; then
   echo "Usage: $0 <project_directory>"
@@ -14,6 +18,9 @@ echo "Project: $PROJECT_DIR" | tee -a "$LOG_FILE"
 TOTAL=0
 PASSED=0
 
+# main loop in the project.
+
+
 for student_dir in "$PROJECT_DIR"/*/; do
     [ -e "$student_dir" ] || continue
 
@@ -22,6 +29,9 @@ for student_dir in "$PROJECT_DIR"/*/; do
 
     echo -e "\nGrading student: $STUDENT" | tee -a "$LOG_FILE"
 
+# building the docker images
+
+
     IMAGE_NAME="grading_$(echo "$STUDENT" | tr '[:upper:]' '[:lower:]' | tr ' ' '_')"
     if ! docker build -t "$IMAGE_NAME" "$student_dir" > /dev/null 2>build_error.log; then
         echo "build failed for $STUDENT. See build_error.log for details." | tee -a "$LOG_FILE"
@@ -29,6 +39,9 @@ for student_dir in "$PROJECT_DIR"/*/; do
     fi
 
     if [[ -f "$PROJECT_DIR/test_input.txt" && -f "$PROJECT_DIR/expected_output.txt" ]]; then
+
+
+# preventing infinite loops with timeout.
 
         ACTUAL_OUTPUT=$(timeout 5s docker run --rm -i "$IMAGE_NAME" < "$PROJECT_DIR/test_input.txt" 2>/dev/null || true)
 
@@ -43,6 +56,8 @@ for student_dir in "$PROJECT_DIR"/*/; do
     else
         echo "No test input or expected output found. Skipping test for $STUDENT." | tee -a "$LOG_FILE"
     fi
+
+# cleaning up docker images
 
     docker rmi "$IMAGE_NAME" > /dev/null 2>&1 || true
 done
