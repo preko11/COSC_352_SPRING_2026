@@ -1,4 +1,4 @@
-Starting the grading process: Fri Feb 13 17:14:30 UTC 2026
+Starting the grading process: Fri Feb 13 18:02:04 UTC 2026
 Project: /workspaces/COSC_352_SPRING_2026
 
 Grading student: Kenzoh33
@@ -118,6 +118,6 @@ build failed for stephen_waita. See build_error.log for details.
 Grading student: taniyah_payton
 build failed for taniyah_payton. See build_error.log for details.
 
-Grading completed: Fri Feb 13 17:14:38 UTC 2026
+Grading completed: Fri Feb 13 18:02:12 UTC 2026
 Total students: 39
 Passed: 0
