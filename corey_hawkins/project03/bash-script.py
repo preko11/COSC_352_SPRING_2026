@@ -98,11 +98,9 @@ run_and_test_container() {
 
     # Constructs the command to run inside the container.
 
-    # local run_command="cat $container_input_path | your_app_command"
+    run_command="cat $container_input_path | your_app_command"
 
-    # Example: If the student's app reads from a file and writes to another:
-
-    # local run_command="your_app_command $container_input_path $container_output_path"
+    run_command="your_app_command $container_input_path $container_output_path"
 
     local actual_output=""
 
@@ -278,3 +276,4 @@ done
 log_message " Grading Complete "
 
 exit 0
+
