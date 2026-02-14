@@ -8,3 +8,4 @@ How to run:
 Output:
   - prints results to terminal
   - writes grading.log
+ 
