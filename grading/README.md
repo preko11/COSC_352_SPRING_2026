@@ -8,8 +8,7 @@ This folder contains a Bash-only automated grader for student Docker submissions
 ## Files
 
 - `docker_grader.sh`: Main grading script
-- `fixtures/project02_input.html`: Known input for Project 02
-- `fixtures/project02_expected.csv`: Expected output for Project 02 validation
+- `fixtures/project02_input.html`: Frozen full HTML snapshot of the programming languages page
 
 ## Run
 
@@ -31,7 +30,12 @@ bash /Users/demiladesojijohn/Desktop/COSC_352_SPRING_2026/grading/docker_grader.
 4. Runs tests with `timeout` so one broken submission cannot block grading.
 5. Validates outputs:
    - Project 01: output must include `hello` and the known name input.
-   - Project 02: output CSV must match the expected CSV fixture.
+   - Project 02: output is validated with a rubric against the full-page fixture:
+     - minimum CSV data-row volume
+     - required header coverage (`Language`, `Original purpose`, paradigm columns, etc.)
+     - known language coverage (Ada, Python, Java, Rust, etc.)
+     - header-row presence
+     - anti-raw-HTML guard (`<table>/<tr>/<td>` markers should not dominate output)
 6. Prints results live and writes them to a log file.
 7. Writes a machine-readable summary CSV with scores and pass/fail.
 8. Cleans up containers and images after each project.
@@ -47,7 +51,12 @@ Each project is scored out of 100 points:
 - Project 02:
   - Build: 30
   - Run with known input: 20
-  - Expected output match: 50
+  - Rubric-based output validation: 50
+
+## Project 02 Accuracy Note
+
+Project 02 now uses a realistic, static webpage snapshot instead of a tiny synthetic table.
+This makes grading more accurate for the actual assignment objective (extracting real webpage tables into CSV) while still remaining deterministic.
 
 ## How To Modify For Future Projects
 

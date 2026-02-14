@@ -18,8 +18,10 @@ SUMMARY_CSV="${SUMMARY_CSV:-$ROOT_DIR/grading_summary_${RUN_ID}.csv}"
 
 PROJECT02_INPUT_DIR="$ROOT_DIR/grading/fixtures"
 PROJECT02_INPUT_FILE="$ROOT_DIR/grading/fixtures/project02_input.html"
-PROJECT02_EXPECTED_FILE="$ROOT_DIR/grading/fixtures/project02_expected.csv"
-PROJECT02_EXPECTED_NORM="/tmp/project02_expected_norm_${RUN_ID}_$$.txt"
+PROJECT02_MIN_DATA_ROWS="${PROJECT02_MIN_DATA_ROWS:-40}"
+PROJECT02_MIN_HEADER_HITS="${PROJECT02_MIN_HEADER_HITS:-6}"
+PROJECT02_MIN_LANGUAGE_HITS="${PROJECT02_MIN_LANGUAGE_HITS:-10}"
+PROJECT02_MAX_HTML_MARKERS="${PROJECT02_MAX_HTML_MARKERS:-5}"
 
 PROJECT01_NAME_INPUT="${PROJECT01_NAME_INPUT:-Ada}"
 PROJECT01_ERROR_REGEX='error|usage|no additional|no name|provide|argument|try again'
@@ -36,6 +38,11 @@ PASS_TESTS=0
 FAIL_TESTS=0
 SCRIPT_START_SECONDS=$SECONDS
 TIMEOUT_WARNED=0
+PROJECT02_LAST_ROW_COUNT=0
+PROJECT02_LAST_HEADER_HITS=0
+PROJECT02_LAST_LANGUAGE_HITS=0
+PROJECT02_LAST_HTML_MARKERS=0
+PROJECT02_LAST_HEADER_ROW_PRESENT=0
 
 : >"$LOG_FILE"
 
@@ -69,6 +76,81 @@ normalize_csv() {
     | sed 's/[[:space:]]*,[[:space:]]*/,/g' \
     | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
     | grep -v '^[[:space:]]*$' >"$output_file"
+}
+
+validate_project02_output_file() {
+  local source_file="$1"
+  local normalized_file="$2"
+  local row_count=0
+  local header_hits=0
+  local language_hits=0
+  local html_markers=0
+  local header_row_present=0
+  local term
+
+  normalize_csv "$source_file" "$normalized_file"
+
+  row_count="$(grep -c ',' "$normalized_file" || true)"
+
+  for term in \
+    "language" \
+    "original purpose" \
+    "imperative" \
+    "object-oriented" \
+    "functional" \
+    "procedural" \
+    "generic" \
+    "reflective" \
+    "other paradigms" \
+    "standardized"; do
+    if grep -Fqi "$term" "$normalized_file"; then
+      header_hits=$((header_hits + 1))
+    fi
+  done
+
+  for term in \
+    "ada" \
+    "c++" \
+    "c#" \
+    "java" \
+    "javascript" \
+    "python" \
+    "go" \
+    "rust" \
+    "ruby" \
+    "swift" \
+    "kotlin" \
+    "fortran" \
+    "perl" \
+    "php" \
+    "haskell" \
+    "lisp"; do
+    if grep -Fqi "$term" "$normalized_file"; then
+      language_hits=$((language_hits + 1))
+    fi
+  done
+
+  if grep -Eiq 'language,.*(original purpose|imperative|object-oriented)' "$normalized_file"; then
+    header_row_present=1
+  fi
+
+  html_markers="$(grep -Eic '<table|<tr|<td|<th|</' "$normalized_file" || true)"
+
+  PROJECT02_LAST_ROW_COUNT="$row_count"
+  PROJECT02_LAST_HEADER_HITS="$header_hits"
+  PROJECT02_LAST_LANGUAGE_HITS="$language_hits"
+  PROJECT02_LAST_HTML_MARKERS="$html_markers"
+  PROJECT02_LAST_HEADER_ROW_PRESENT="$header_row_present"
+
+  if [ "$row_count" -ge "$PROJECT02_MIN_DATA_ROWS" ] \
+    && [ "$header_hits" -ge "$PROJECT02_MIN_HEADER_HITS" ] \
+    && [ "$language_hits" -ge "$PROJECT02_MIN_LANGUAGE_HITS" ] \
+    && [ "$header_row_present" -eq 1 ] \
+    && [ "$html_markers" -le "$PROJECT02_MAX_HTML_MARKERS" ]; then
+    return 0
+  fi
+
+  return 1
 }
 
 find_dockerfile() {
@@ -432,6 +514,9 @@ grade_project02() {
   local candidate_file
   local candidate_norm
   local matched_source=""
+  local combined_candidates
+  local candidates_list
+  local validation_detail=""
 
   student_id="$(safe_id "$student")"
   image_tag="grader_${student_id}_p02_${RUN_ID}_$$"
@@ -471,33 +556,43 @@ grade_project02() {
       notes="$notes run failed;"
     fi
 
-    if [ "$run_ok" -eq 1 ]; then
-      while IFS= read -r candidate_file; do
-        candidate_norm="/tmp/${container_name}_candidate_norm.txt"
-        normalize_csv "$candidate_file" "$candidate_norm"
+      if [ "$run_ok" -eq 1 ]; then
+      candidates_list="/tmp/${container_name}_csv_candidates.list"
+      combined_candidates="/tmp/${container_name}_csv_combined.txt"
+      : >"$candidates_list"
+      : >"$combined_candidates"
 
-        if diff -q "$PROJECT02_EXPECTED_NORM" "$candidate_norm" >/dev/null 2>&1; then
+      collect_csv_candidates "$container_name" "$image_tag" >"$candidates_list"
+
+      if [ -s "$candidates_list" ]; then
+        while IFS= read -r candidate_file; do
+          cat "$candidate_file" >>"$combined_candidates"
+          printf '\n' >>"$combined_candidates"
+        done <"$candidates_list"
+
+        candidate_norm="/tmp/${container_name}_combined_norm.txt"
+        if validate_project02_output_file "$combined_candidates" "$candidate_norm"; then
           output_ok=1
-          matched_source="$candidate_file"
-          break
+          matched_source="combined-csv-files"
+          validation_detail="rows=$PROJECT02_LAST_ROW_COUNT headers=$PROJECT02_LAST_HEADER_HITS languages=$PROJECT02_LAST_LANGUAGE_HITS html_markers=$PROJECT02_LAST_HTML_MARKERS"
         fi
-      done < <(collect_csv_candidates "$container_name" "$image_tag")
+      fi
 
       if [ "$output_ok" -eq 0 ]; then
         candidate_norm="/tmp/${container_name}_stdout_norm.txt"
-        normalize_csv "$run_log" "$candidate_norm"
-        if diff -q "$PROJECT02_EXPECTED_NORM" "$candidate_norm" >/dev/null 2>&1; then
+        if validate_project02_output_file "$run_log" "$candidate_norm"; then
           output_ok=1
           matched_source="container-stdout"
+          validation_detail="rows=$PROJECT02_LAST_ROW_COUNT headers=$PROJECT02_LAST_HEADER_HITS languages=$PROJECT02_LAST_LANGUAGE_HITS html_markers=$PROJECT02_LAST_HTML_MARKERS"
         fi
       fi
 
       if [ "$output_ok" -eq 1 ]; then
         tests_passed=$((tests_passed + 1))
         score=$((score + 50))
-        report_test "$student" "$project" "output-validation" 1 "Output matched expected CSV ($matched_source)"
+        report_test "$student" "$project" "output-validation" 1 "Output passed rubric from $matched_source ($validation_detail)"
       else
-        report_test "$student" "$project" "output-validation" 0 "Expected CSV not found/mismatched"
+        report_test "$student" "$project" "output-validation" 0 "Output failed rubric (rows=$PROJECT02_LAST_ROW_COUNT headers=$PROJECT02_LAST_HEADER_HITS languages=$PROJECT02_LAST_LANGUAGE_HITS header_row=$PROJECT02_LAST_HEADER_ROW_PRESENT html_markers=$PROJECT02_LAST_HTML_MARKERS)"
         notes="$notes output validation failed;"
       fi
     else
@@ -565,12 +660,10 @@ main() {
     return 1
   fi
 
-  if [ ! -f "$PROJECT02_INPUT_FILE" ] || [ ! -f "$PROJECT02_EXPECTED_FILE" ]; then
-    log "ERROR: Missing fixture files under $PROJECT02_INPUT_DIR"
+  if [ ! -f "$PROJECT02_INPUT_FILE" ]; then
+    log "ERROR: Missing Project 02 input fixture: $PROJECT02_INPUT_FILE"
     return 1
   fi
-
-  normalize_csv "$PROJECT02_EXPECTED_FILE" "$PROJECT02_EXPECTED_NORM"
 
   printf 'student,project,status,score,tests_passed,tests_total,notes\n' >"$SUMMARY_CSV"
 
