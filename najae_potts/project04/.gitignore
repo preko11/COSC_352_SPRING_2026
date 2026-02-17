@@ -1,0 +1,33 @@
+# Java bytecode and build artifacts
+*.class
+java/classes/
+*.jar
+
+# Kotlin build artifacts
+kotlin/classes/
+kotlin/*.jar
+
+# Go binary
+golang/prime_counter
+
+# Test data files
+numbers.txt
+*.txt
+
+# IDE/Editor files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build/cache directories
+target/
+build/
+dist/
+.gradle/
