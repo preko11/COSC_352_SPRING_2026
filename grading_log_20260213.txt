@@ -1,8 +1,5 @@
-Starting the grading process: Fri Feb 13 18:02:04 UTC 2026
+Starting the grading process: Fri Feb 13 17:54:33 UTC 2026
 Project: /workspaces/COSC_352_SPRING_2026
-
-Grading student: Kenzoh33
-No test input or expected output found. Skipping test for Kenzoh33.
 
 Grading student: aaron_herron
 build failed for aaron_herron. See build_error.log for details.
@@ -52,9 +49,6 @@ build failed for jessica_madu. See build_error.log for details.
 Grading student: joseph_egbujonuma
 build failed for joseph_egbujonuma. See build_error.log for details.
 
-Grading student: joseph_wellington
-build failed for joseph_wellington. See build_error.log for details.
-
 Grading student: karl_agli
 build failed for karl_agli. See build_error.log for details.
 
@@ -97,14 +91,11 @@ build failed for professor_jon_white. See build_error.log for details.
 Grading student: randolph_bame
 build failed for randolph_bame. See build_error.log for details.
 
-Grading student: rashaa_mcqueen
-build failed for rashaa_mcqueen. See build_error.log for details.
-
 Grading student: rochak_ghimire
 build failed for rochak_ghimire. See build_error.log for details.
 
 Grading student: sandeep_shah
-No test input or expected output found. Skipping test for sandeep_shah.
+build failed for sandeep_shah. See build_error.log for details.
 
 Grading student: sharif_jenkins
 build failed for sharif_jenkins. See build_error.log for details.
@@ -118,6 +109,6 @@ build failed for stephen_waita. See build_error.log for details.
 Grading student: taniyah_payton
 build failed for taniyah_payton. See build_error.log for details.
 
-Grading completed: Fri Feb 13 18:02:12 UTC 2026
-Total students: 39
+Grading completed: Fri Feb 13 17:54:40 UTC 2026
+Total students: 37
 Passed: 0
