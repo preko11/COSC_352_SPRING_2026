@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 read_html_table.py
 
