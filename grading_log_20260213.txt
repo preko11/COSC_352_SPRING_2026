@@ -58,9 +58,6 @@ build failed for kyle_holmes. See build_error.log for details.
 Grading student: mahki_titus
 build failed for mahki_titus. See build_error.log for details.
 
-Grading student: main
-build failed for main. See build_error.log for details.
-
 Grading student: marcus_crosby
 build failed for marcus_crosby. See build_error.log for details.
 
