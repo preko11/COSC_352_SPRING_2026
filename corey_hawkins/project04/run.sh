@@ -2,7 +2,7 @@
 
 DEFAULT_TEST_FILE="numbers.txt"
 
-# Determine the number of threads for multi-threading (can be adjusted)
+# Determines the number of threads for multi-threading (can be adjusted)
 
 NUM_THREADS=$(nproc 2>/dev/null || echo 4) # Use nproc, fallback to 4 if it fails
 
@@ -16,25 +16,25 @@ fi
 
 print_header() {
 
-    echo e "\n\033[1;34m $1 \033[0m" # Blue and bold header
+    echo e "\n\033[1;34m $1 \033[0m"
 
 }
 
 print_language_header() {
 
-    echo e "\n\033[1;36m $1 \033[0m" # Cyan and bold language header
+    echo e "\n\033[1;36m $1 \033[0m" 
 
 }
 
 print_result() {
 
-    echo -e "\033[0;32m$1\033[0m" # Green text
+    echo -e "\033[0;32m$1\033[0m" 
 
 }
 
 print_error() {
 
-    echo -e "\033[0;31mError: $1\033[0m" >&2 # Red text to stderr
+    echo -e "\033[0;31mError: $1\033[0m" >&2
 
 }
 
@@ -122,3 +122,4 @@ JAVA_CLASS_FILE="$JAVA_SRC_DIR/"
 
 
 echo "Compiling Java..."
+
