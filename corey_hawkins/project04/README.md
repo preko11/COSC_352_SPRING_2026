@@ -1,13 +1,13 @@
 How to Run
 
-1. Ensure the `java`, `kotlin`, and `golang` directories, along with `run.sh`, are in the same parent directory.
+1. Ensure the java, kotlin, and golang directories, along with "run.sh", are in the same parent directory.
 
-   The script defaults to using `numbers.txt` in the root directory.
+   The script defaults to using numbers.txt in the root directory.
 
-    You can also create your own file (e.g., `my_large_numbers.txt`) with integers, one per line.
+    You can also create your own file with integers, one per line.
 
  
-3.  Make `run.sh` Executable:
+3.  Make "run.sh" Executable:
 
     ```bash
 
@@ -17,7 +17,7 @@ How to Run
 
 4.  Run the Script:
 
-     To use the default `numbers.txt`:
+     To use the default "numbers.txt":
 
         ```bash
 
