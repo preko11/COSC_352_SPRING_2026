@@ -1,82 +1,142 @@
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.concurrent.Callable
+import java.io.File
 import java.util.concurrent.Executors
+import kotlin.math.sqrt
 
-fun main(args: Array<String>) {
-    if (args.isEmpty()) {
-        println("Usage: kotlin PrimeCounterKt <numbers-file>")
-        return
-    }
-
-    val path = Paths.get(args[0])
-    if (!Files.isReadable(path)) {
-        println("Cannot read file: $path")
-        return
-    }
-
-    val numbers = ArrayList<Long>()
-    Files.readAllLines(path).forEach { line ->
-        val s = line?.trim() ?: return@forEach
-        if (s.isEmpty()) return@forEach
-        try {
-            numbers.add(s.toLong())
-        } catch (_: NumberFormatException) {
-        }
-    }
-
-    println("File: $path (${numbers.size} numbers)\n")
-
-    val singleStart = System.nanoTime()
-    var singleCount = 0L
-    for (v in numbers) if (isPrime(v)) singleCount++
-    val singleMs = (System.nanoTime() - singleStart) / 1_000_000
-
-    println("[Single-Threaded]")
-    println("  Primes found: $singleCount")
-    println("  Time: ${singleMs} ms\n")
-
-    val threads = Runtime.getRuntime().availableProcessors()
-    val ex = Executors.newFixedThreadPool(threads)
-    val tasks = ArrayList<Callable<Long>>()
-
-    val n = numbers.size
-    val chunk = (n + threads - 1) / threads
-    var i = 0
-    while (i < n) {
-        val lo = i
-        val hi = minOf(n, i + chunk)
-        tasks.add(Callable {
-            var local = 0L
-            for (j in lo until hi) if (isPrime(numbers[j])) local++
-            local
-        })
-        i += chunk
-    }
-
-    val pStart = System.nanoTime()
-    val results = ex.invokeAll(tasks)
-    var total = 0L
-    results.forEach { total += it.get() }
-    val pMs = (System.nanoTime() - pStart) / 1_000_000
-
-    println("[Multi-Threaded] ($threads threads)")
-    println("  Primes found: $total")
-    println("  Time: ${pMs} ms\n")
-    val speedup = singleMs.toDouble() / maxOf(1L, pMs).toDouble()
-    println(String.format("Speedup: %.2fx", speedup))
-
-    ex.shutdownNow()
-}
-
-fun isPrime(n: Long): Boolean {
-    if (n <= 1) return false
-    if (n <= 3) return true
-    if (n % 2L == 0L || n % 3L == 0L) return false
+/**
+ * Efficient primality test using trial division optimized with 6k±1 pattern.
+ */
+fun isPrime(n: Int): Boolean {
+    if (n < 2) return false
+    if (n == 2) return true
+    if (n == 3) return true
+    if (n % 2 == 0) return false
+    if (n % 3 == 0) return false
+    
+    // Check factors of the form 6k±1 up to sqrt(n)
     var i = 5L
     while (i * i <= n) {
-        if (n % i == 0L || n % (i + 2L) == 0L) return false
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false
+        }
         i += 6
     }
     return true
+}
+
+/**
+ * Read integers from file, skipping invalid entries.
+ */
+fun readNumbers(filePath: String): List<Int> {
+    return File(filePath)
+        .readLines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+        .mapNotNull { line ->
+            try {
+                line.toInt()
+            } catch (e: NumberFormatException) {
+                null
+            }
+        }
+}
+
+/**
+ * Single-threaded prime counter.
+ */
+fun countPrimesSingleThreaded(numbers: List<Int>): Long {
+    return numbers.count { isPrime(it) }.toLong()
+}
+
+/**
+ * Multi-threaded prime counter using thread pool.
+ */
+fun countPrimesMultiThreaded(numbers: List<Int>, threadCount: Int): Long {
+    val executor = Executors.newFixedThreadPool(threadCount)
+    val chunkSize = maxOf(1, numbers.size / threadCount)
+    
+    val futures = numbers
+        .chunked(chunkSize)
+        .map { chunk ->
+            executor.submit {
+                chunk.count { isPrime(it) }.toLong()
+            }
+        }
+    
+    val totalCount = futures.sumOf { it.get() }
+    executor.shutdown()
+    
+    return totalCount
+}
+
+/**
+ * Format number with thousands separator.
+ */
+fun formatNumber(num: Long): String = String.format("%,d", num)
+
+/**
+ * Format time in milliseconds with one decimal place.
+ */
+fun formatTime(nanos: Long): String = String.format("%.1f", nanos / 1_000_000.0)
+
+fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        System.err.println("Usage: kotlin PrimeCounterKt <file_path>")
+        System.exit(1)
+    }
+    
+    val filePath = args[0]
+    
+    try {
+        // Read file
+        val numbers = readNumbers(filePath)
+        
+        if (numbers.isEmpty()) {
+            System.err.println("Error: File contains no valid integers.")
+            System.exit(1)
+        }
+        
+        // Get file info
+        val file = File(filePath)
+        val fileName = file.name
+        
+        println("File: $fileName (${formatNumber(numbers.size.toLong())} numbers)\n")
+        
+        // Single-threaded run
+        var startTime = System.nanoTime()
+        val countSingle = countPrimesSingleThreaded(numbers)
+        val durationSingle = System.nanoTime() - startTime
+        
+        println("[Single-Threaded]")
+        println("  Primes found: ${formatNumber(countSingle)}")
+        println("  Time: ${formatTime(durationSingle)} ms\n")
+        
+        // Multi-threaded run
+        val threadCount = Runtime.getRuntime().availableProcessors()
+        startTime = System.nanoTime()
+        val countMulti = countPrimesMultiThreaded(numbers, threadCount)
+        val durationMulti = System.nanoTime() - startTime
+        
+        println("[Multi-Threaded] ($threadCount threads)")
+        println("  Primes found: ${formatNumber(countMulti)}")
+        println("  Time: ${formatTime(durationMulti)} ms\n")
+        
+        // Verify correctness
+        if (countSingle != countMulti) {
+            System.err.println("ERROR: Prime counts differ!")
+            System.exit(1)
+        }
+        
+        // Calculate and display speedup
+        val speedup = durationSingle.toDouble() / durationMulti
+        println("Speedup: ${String.format("%.2f", speedup)}x")
+        
+    } catch (e: Exception) {
+        when (e) {
+            is java.io.FileNotFoundException -> System.err.println("Error: File not found: $filePath")
+            is java.io.IOException -> System.err.println("Error reading file: ${e.message}")
+            is InterruptedException -> System.err.println("Error in multi-threaded execution: ${e.message}")
+            else -> System.err.println("Error: ${e.message}")
+        }
+        System.exit(1)
+    }
 }
