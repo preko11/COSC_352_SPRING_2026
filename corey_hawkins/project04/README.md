@@ -33,4 +33,4 @@ How to Run
 
         ```
 
-The script will then compile each language's code (if necessary), run both the single-threaded and multi-threaded versions, and print the results for comparison.
+The script should then compile each language's code, run both the single-threaded and multi-threaded versions, and print the results for comparison.
