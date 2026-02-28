@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install required R packages
-RUN R -e "install.packages(c('httr','rvest','xml2','dplyr','ggplot2'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('httr','rvest','xml2','dplyr','ggplot2','stringr'), repos='https://cloud.r-project.org/')"
 
 COPY histogram.R /app/
 

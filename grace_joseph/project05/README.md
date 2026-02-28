@@ -67,11 +67,8 @@ RUNNING  PROJECT
 
 This project is containerized using Docker to ensure reproducibility.
 
-Build the Docker image:
-docker build -t victim-ages .
-
-Run the container:
-docker run victim-ages
+Build and Run using entry:
+.\run.sh
 
 The container will:
 1.	Scrape the webpage
