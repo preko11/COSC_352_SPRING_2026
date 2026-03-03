@@ -15,7 +15,7 @@ prime_counter
 # ===== OS Files =====
 .DS_Store
 
-# ===== Build directories (if ever added) =====
+# ===== Build directories=====
 out/
 build/
 bin/
