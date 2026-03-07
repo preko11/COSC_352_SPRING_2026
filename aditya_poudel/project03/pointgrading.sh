@@ -2,7 +2,7 @@
 set -u
 
 ###############################################################################
-# COSC_352_SPRING_2026 - Project03 Point Grader (Bash-only)
+# COSC_352_SPRING_2026 - Project03 Point Grader 
 #
 # Per project scoring (starts at 100):
 #   - folder missing  => build fails + test fails => -60 => 40
@@ -26,9 +26,13 @@ set -u
 #   - All log messages go to STDERR and to LOG_FILE (tee), never to STDOUT.
 #   - Only "score|reason" is printed to STDOUT for parsing.
 ###############################################################################
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Default repo root when running on host (script inside .../aditya_poudel/project03)
+DEFAULT_REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Allow override for Docker runs (mount repo to /work and set REPO_ROOT_OVERRIDE=/work)
+REPO_ROOT="${REPO_ROOT_OVERRIDE:-$DEFAULT_REPO_ROOT}"
 
 TESTDATA_DIR="$SCRIPT_DIR/testdata"
 P2_HTML="$TESTDATA_DIR/sample.html"
