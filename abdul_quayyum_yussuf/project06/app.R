@@ -10,6 +10,8 @@ library(stringr)
 library(ggplot2)
 library(plotly)
 library(DT)
+library(dplyr)
+library(lubridate)
 
 # ============================================================================
 # DATA PIPELINE — reused from Project 5 (histogram.R)
@@ -18,31 +20,27 @@ library(DT)
 BASE_URL <- "https://chamspage.blogspot.com"
 URLS <- list(
   "2025" = paste0(BASE_URL, "/2025/01/2025-baltimore-city-homicide-list.html"),
-  "2024" = paste0(BASE_URL, "/2024/01/2024-baltimore-city-homicide-list.html"),
-  "2023" = paste0(BASE_URL, "/2023/01/2023-baltimore-city-homicide-list.html")
+  "2026" = paste0(BASE_URL, "/2026/01/2026-baltimore-city-homicide-list.html")
 )
 
 scrape_year <- function(url, year) {
   tryCatch({
     page <- read_html(url)
-    tables <- page %>% html_table(fill = TRUE)
-    if (length(tables) == 0) return(NULL)
-    best <- NULL
-    for (tbl in tables) {
-      if (nrow(tbl) > 5 && ncol(tbl) > 3) {
-        cn <- tolower(names(tbl))
-        if (any(grepl("victim|name|age|date|method|address|camera|closed", cn))) {
-          best <- tbl
-          break
-        }
-      }
-    }
-    if (is.null(best)) {
-      sizes <- sapply(tables, function(x) nrow(x) * ncol(x))
-      best <- tables[[which.max(sizes)]]
-    }
-    best$scrape_year <- as.integer(year)
-    best
+    tbl <- html_node(page, "#homicidelist")
+    raw <- html_table(tbl, fill = TRUE)
+    
+    if (nrow(raw) == 0) return(NULL)
+    
+    colnames(raw) <- as.character(raw[1, ])
+    data <- raw[-1, ]
+    data <- data %>% select(1:9)
+    colnames(data) <- c(
+      "No", "Date", "Name", "Age", "Address", "Notes",
+      "NoCriminalHistory", "Camera", "CaseClosed"
+    )
+    data <- data %>% filter(str_trim(Date) != "" & !is.na(Date))
+    data$scrape_year <- as.integer(year)
+    data
   }, error = function(e) NULL)
 }
 
@@ -220,7 +218,7 @@ if (nrow(HOMICIDES) > 0) {
 
 # Compute safe ranges for UI
 YEAR_CHOICES <- sort(unique(HOMICIDES$year[!is.na(HOMICIDES$year)]))
-if (length(YEAR_CHOICES) == 0) YEAR_CHOICES <- c(2024L, 2025L)
+if (length(YEAR_CHOICES) == 0) YEAR_CHOICES <- c(2025L, 2026L)
 AGE_MIN <- min(HOMICIDES$age, na.rm = TRUE)
 AGE_MAX <- max(HOMICIDES$age, na.rm = TRUE)
 if (!is.finite(AGE_MIN)) AGE_MIN <- 0
@@ -499,7 +497,7 @@ server <- function(input, output, session) {
 
     p <- ggplot(agg, aes(x = Month, y = Count, fill = Year)) +
       geom_col(position = "dodge") +
-      scale_fill_manual(values = c("2024" = "#3498db", "2025" = "#e74c3c")) +
+      scale_fill_manual(values = c("2025" = "#3498db", "2026" = "#e74c3c")) +
       labs(x = NULL, y = "Homicides") +
       theme_minimal(base_size = 13) +
       theme(legend.position = "top")
@@ -548,7 +546,7 @@ server <- function(input, output, session) {
     p <- ggplot(agg, aes(x = Year, y = Count, fill = Year)) +
       geom_col(show.legend = FALSE) +
       geom_text(aes(label = Count), vjust = -0.5, size = 5) +
-      scale_fill_manual(values = c("2024" = "#3498db", "2025" = "#e74c3c")) +
+      scale_fill_manual(values = c("2025" = "#3498db", "2026" = "#e74c3c")) +
       labs(x = NULL, y = "Homicides") +
       theme_minimal(base_size = 13) +
       expand_limits(y = max(agg$Count) * 1.15)
@@ -575,7 +573,7 @@ server <- function(input, output, session) {
     p <- ggplot(cum_df, aes(x = day_of_year, y = cum,
                             color = factor(year), group = factor(year))) +
       geom_line(linewidth = 1.1) +
-      scale_color_manual(values = c("2024" = "#3498db", "2025" = "#e74c3c"),
+      scale_color_manual(values = c("2025" = "#3498db", "2026" = "#e74c3c"),
                          name = "Year") +
       labs(x = "Day of Year", y = "Cumulative Homicides") +
       theme_minimal(base_size = 13) +
@@ -623,7 +621,7 @@ server <- function(input, output, session) {
       geom_col(show.legend = FALSE) +
       geom_text(aes(label = paste0(Rate, "%\n(", Cleared, "/", Total, ")")),
                 vjust = -0.3, size = 4) +
-      scale_fill_manual(values = c("2024" = "#27ae60", "2025" = "#2ecc71")) +
+      scale_fill_manual(values = c("2025" = "#27ae60", "2026" = "#2ecc71")) +
       labs(x = NULL, y = "Clearance Rate (%)") +
       theme_minimal(base_size = 13) +
       expand_limits(y = max(agg$Rate) * 1.25)
@@ -686,7 +684,7 @@ server <- function(input, output, session) {
 
     p <- ggplot(agg, aes(x = AgeGroup, y = Count, fill = Year)) +
       geom_col(position = "dodge") +
-      scale_fill_manual(values = c("2024" = "#3498db", "2025" = "#e74c3c")) +
+      scale_fill_manual(values = c("2025" = "#3498db", "2026" = "#e74c3c")) +
       labs(x = "Age Group", y = "Count") +
       theme_minimal(base_size = 13) +
       theme(legend.position = "top")

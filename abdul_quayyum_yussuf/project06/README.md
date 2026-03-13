@@ -2,13 +2,10 @@
 
 ## Overview
 
-This project provides a comprehensive analysis of Baltimore City homicides through both static data visualization (Part 1) and an interactive web dashboard (Part 2). The project scrapes homicide data from the Chamspage blog and processes it for police department briefings and investigative analysis.
+This project provides a comprehensive analysis of Baltimore City homicides through an interactive web dashboard. The project reuses the data pipeline from Project 5, scraping homicide data from the Chamspage blog for 2025 and 2026, and processes it for police department briefings and investigative analysis.
 
-### Part 1: Data Pipeline and Histogram
-Static analysis that scrapes 2023-2025 Baltimore City homicide lists from Chamspage and produces a histogram of victim ages, combining multiple years for stronger demographic pattern visualization.
-
-### Part 2: Interactive Shiny Dashboard
-Dynamic web application built on Part 1's data pipeline, providing real-time filtering, multiple interactive visualizations, and summary statistics for operational decision-making.
+### Interactive Shiny Dashboard
+Dynamic web application providing real-time filtering, multiple interactive visualizations, and summary statistics for operational decision-making.
 
 ## Quick Start
 
@@ -21,8 +18,8 @@ Requires only Docker. No other dependencies needed.
 
 ## Features
 
-### Interactive Filters (Part 2)
-- **Year Range**: Select specific years (2023-2025) to analyze
+### Interactive Filters
+- **Year Range**: Select specific years (2025-2026) to analyze
 - **Month**: Multi-select dropdown for filtering by months
 - **Victim Age Range**: Slider to filter by minimum and maximum victim age
 - **Include Unknown Ages**: Checkbox to include/exclude records with missing age data
@@ -33,22 +30,25 @@ Requires only Docker. No other dependencies needed.
 ### Visualizations
 All charts update dynamically based on applied filters:
 
-1. **Homicides Over Time**: Line chart showing monthly homicide trends by year
-2. **Homicides by Method**: Bar chart displaying counts by homicide method (Shooting, Stabbing, Beating, Other)
-3. **Homicides by District**: Bar chart showing incidents by geographic area
-4. **Incident Map**: Interactive Leaflet map with color-coded markers (green=closed, red=open) showing incident locations with popup details
-5. **Data Table**: Filterable, sortable table of all incident data with per-column filters
-6. **Age Distribution**: Histogram with 5-year bins and interactive hover
-7. **Age Groups by Year**: Side-by-side comparison of age categories across years
-8. **Cumulative Pace Chart**: Year-over-year running homicide counts by day-of-year
-9. **Camera Coverage Distribution**: Bar chart showing incidents by camera proximity
-10. **Clearance Rate by Year**: Bar chart with rates and sample sizes
+1. **Monthly Homicides by Year**: Bar chart showing monthly homicide trends by year
+2. **Case Status Breakdown**: Pie chart displaying open vs closed cases
+3. **Top 15 Locations**: Bar chart showing incidents by street
+4. **Yearly Comparison**: Bar chart comparing total homicides by year
+5. **Cumulative Homicides — Year-over-Year Pace**: Line chart showing running homicide counts by day-of-year
+6. **Camera Coverage Distribution**: Bar chart showing incidents by camera proximity
+7. **Clearance Rate by Year**: Bar chart with rates and sample sizes
+8. **Age Distribution**: Histogram with 5-year bins and interactive hover
+9. **Age Groups by Year**: Side-by-side comparison of age categories across years
+10. **Filtered Case Records**: Filterable, sortable table of all incident data with per-column filters
 
 ### Summary Statistics Panel
 - Total homicides in filtered period
 - Case clearance rate (%)
-- Average/median victim age
-- Most common homicide method
+- Median victim age
+- Year-over-year change
+- Youngest victim age
+- Oldest victim age
+- Percentage of victims under 25
 - Percentage of incidents near CCTV cameras
 - Year-over-year comparison
 - Age demographics (youngest/oldest, % under 25)
