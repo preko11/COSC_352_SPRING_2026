@@ -1,11 +1,13 @@
 #!/bin/bash
 
-echo "Building Docker image..."
+# Define name
+IMAGE_NAME="homicide-dashboard"
 
-docker build -t homicide-dashboard .
+echo "Step 1: Cleaning up old containers..."
+docker stop $(docker ps -q --filter ancestor=$IMAGE_NAME) 2>/dev/null
 
-echo "Starting dashboard..."
+echo "Step 2: Building image (this will take a few minutes)..."
+docker build -t $IMAGE_NAME .
 
-docker run -p 3838:3838 homicide-dashboard
-
-echo "Open http://localhost:3838 in your browser"
+echo "Step 3: Starting dashboard at http://localhost:3838"
+docker run -p 3838:3838 $IMAGE_NAME
