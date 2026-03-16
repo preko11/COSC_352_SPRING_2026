@@ -1,13 +1,42 @@
 #!/bin/bash
 set -e
 
-echo "Building Docker image..."
-docker build --platform=linux/amd64 -t homicide-dashboard .
+IMAGE_NAME="bpd-homicide-dashboard"
+CONTAINER_NAME="bpd-dashboard"
+PORT=3838
 
-echo "Removing old container if it exists..."
-docker rm -f homicide-dashboard 2>/dev/null || true
+echo ""
+echo "╔══════════════════════════════════════════════════════╗"
+echo "║   Baltimore City Police Department                   ║"
+echo "║   Homicide Analysis Dashboard — Launcher             ║"
+echo "╚══════════════════════════════════════════════════════╝"
+echo ""
 
-echo "Starting dashboard..."
-docker run -d --platform=linux/amd64 -p 3838:3838 --name homicide-dashboard homicide-dashboard
+echo "⏹  Stopping any existing container..."
+docker stop $CONTAINER_NAME 2>/dev/null || true
+docker rm   $CONTAINER_NAME 2>/dev/null || true
 
-echo "Dashboard running at http://localhost:3838"
+echo "🔨 Building Docker image..."
+docker build -t $IMAGE_NAME .
+
+echo ""
+echo "🚀 Starting dashboard container..."
+docker run -d \
+    --name $CONTAINER_NAME \
+    -p $PORT:3838 \
+    $IMAGE_NAME
+
+echo "⏳ Waiting for Shiny server to start (30 seconds)..."
+sleep 30
+
+echo ""
+echo "╔══════════════════════════════════════════════════════╗"
+echo "║  ✅ Dashboard is LIVE!                               ║"
+echo "║                                                      ║"
+echo "║  👉 Open your browser and go to:                     ║"
+echo "║     http://localhost:3838/bpd/                       ║"
+echo "║                                                      ║"
+echo "║  To stop:  docker stop bpd-dashboard                 ║"
+echo "║  To logs:  docker logs bpd-dashboard                 ║"
+echo "╚══════════════════════════════════════════════════════╝"
+echo ""
