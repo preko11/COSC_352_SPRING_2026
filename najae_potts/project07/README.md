@@ -1,0 +1,2 @@
+Develop a command-line data profiling tool written in Rust that ingests any CSV file and produces a structured report describing the shape, quality, and statistical characteristics of each column. The tool is built as a demonstration of idiomatic Rust design — traits, ownership, error handling, and zero-cost abstractions — while remaining fast enough to handle large files without loading them entirely into memory.
+
