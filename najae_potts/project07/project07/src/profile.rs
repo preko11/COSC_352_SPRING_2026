@@ -5,7 +5,7 @@ use std::{
     collections::{HashMap, HashSet},
     fs::File,
     io::BufReader,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 pub struct ProfileConfig {
@@ -48,7 +48,7 @@ pub struct DatasetReport {
 }
 
 pub trait ColumnProfiler {
-    fn ingest(&mut self, value: &str);
+    fn ingest(&mut self, value: &str, should_infer: bool);
     fn finalize(self) -> ColumnReport;
 }
 
@@ -78,7 +78,7 @@ struct ColumnInferenceState {
     date_max: Option<NaiveDate>,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 enum TypeHint {
     Integer,
     Float,
@@ -173,7 +173,7 @@ impl ColumnInferenceState {
 }
 
 impl ColumnProfiler for ColumnInferenceState {
-    fn ingest(&mut self, value: &str) {
+    fn ingest(&mut self, value: &str, should_infer: bool) {
         self.total_count += 1;
         let trimmed = value.trim();
 
@@ -186,39 +186,44 @@ impl ColumnProfiler for ColumnInferenceState {
         self.unique_values.insert(trimmed.to_string());
         *self.top_counts.entry(trimmed.to_string()).or_default() += 1;
 
-        let hint = classify_value(trimmed);
-        if !self.observed_types.insert(hint.clone()) {
-            // already seen this hint
-        }
-        if self.observed_types.len() > 1 {
-            self.mixed_type = true;
-        }
+        if should_infer {
+            let hint = classify_value(trimmed);
+            if !self.observed_types.insert(hint.clone()) {
+                // already seen this hint
+            }
+            if self.observed_types.len() > 1 {
+                self.mixed_type = true;
+            }
 
-        match hint {
-            TypeHint::Integer => {
-                self.integer_count += 1;
-                if let Ok(value) = trimmed.parse::<f64>() {
-                    self.add_numeric(value);
+            match hint {
+                TypeHint::Integer => {
+                    self.integer_count += 1;
+                    if let Ok(value) = trimmed.parse::<f64>() {
+                        self.add_numeric(value);
+                    }
+                }
+                TypeHint::Float => {
+                    self.float_count += 1;
+                    if let Ok(value) = trimmed.parse::<f64>() {
+                        self.add_numeric(value);
+                    }
+                }
+                TypeHint::Boolean => {
+                    self.boolean_count += 1;
+                }
+                TypeHint::Date => {
+                    self.date_count += 1;
+                    if let Some(date) = parse_date(trimmed) {
+                        update_min_max_date(&mut self.date_min, &mut self.date_max, date);
+                    }
+                }
+                TypeHint::Text => {
+                    self.text_count += 1;
                 }
             }
-            TypeHint::Float => {
-                self.float_count += 1;
-                if let Ok(value) = trimmed.parse::<f64>() {
-                    self.add_numeric(value);
-                }
-            }
-            TypeHint::Boolean => {
-                self.boolean_count += 1;
-            }
-            TypeHint::Date => {
-                self.date_count += 1;
-                if let Some(date) = parse_date(trimmed) {
-                    update_min_max_date(&mut self.date_min, &mut self.date_max, date);
-                }
-            }
-            TypeHint::Text => {
-                self.text_count += 1;
-            }
+        } else if let Ok(value) = trimmed.parse::<f64>() {
+            // continue numeric statistics for later columns even when inference sampling is complete
+            self.add_numeric(value);
         }
 
         update_min_max_string(&mut self.string_min, &mut self.string_max, trimmed);
@@ -263,6 +268,8 @@ impl ColumnProfiler for ColumnInferenceState {
             }
         }
 
+        let top_values = self.top_values(5);
+
         ColumnReport {
             name: self.name,
             inferred_type,
@@ -274,7 +281,7 @@ impl ColumnProfiler for ColumnInferenceState {
             max: self.string_max,
             mean,
             stddev,
-            top_values: self.top_values(5),
+            top_values,
             warnings,
         }
     }
@@ -308,15 +315,6 @@ fn parse_date(value: &str) -> Option<NaiveDate> {
         }
     }
     None
-}
-
-fn add_numeric_to_bounds(state: &mut ColumnInferenceState, value: f64) {
-    if state.numeric_min.map_or(true, |min| value < min) {
-        state.numeric_min = Some(value);
-    }
-    if state.numeric_max.map_or(true, |max| value > max) {
-        state.numeric_max = Some(value);
-    }
 }
 
 impl ColumnInferenceState {
@@ -357,16 +355,19 @@ pub fn profile_csv(path: &Path, config: ProfileConfig) -> anyhow::Result<Dataset
         .has_headers(config.has_headers)
         .from_reader(BufReader::new(file));
 
-    let headers = if config.has_headers {
-        reader
+    let mut first_record = None;
+    let headers: Vec<String>;
+    let records = if config.has_headers {
+        headers = reader
             .headers()
             .context("could not read CSV headers")?
             .iter()
             .map(|h| h.to_string())
-            .collect()
+            .collect();
+        reader.records()
     } else {
-        let first_record = reader
-            .records()
+        let mut records = reader.records();
+        first_record = records
             .next()
             .transpose()
             .context("could not read first record")?;
@@ -374,16 +375,32 @@ pub fn profile_csv(path: &Path, config: ProfileConfig) -> anyhow::Result<Dataset
             .as_ref()
             .map(|r| r.len())
             .unwrap_or(0);
-        (0..num_columns)
+        headers = (0..num_columns)
             .map(|i| format!("column_{}", i + 1))
-            .collect()
+            .collect();
+        records
     };
 
     let mut columns: Vec<ColumnInferenceState> =
         headers.into_iter().map(ColumnInferenceState::new).collect();
 
     let mut row_count = 0;
-    for result in reader.records() {
+    if let Some(record) = first_record {
+        row_count += 1;
+        if record.len() != columns.len() {
+            return Err(anyhow::anyhow!(
+                "record length {} does not match header length {}",
+                record.len(),
+                columns.len()
+            ));
+        }
+        for (col, value) in columns.iter_mut().zip(record.iter()) {
+            let should_infer = config.sample_size == 0 || col.sample_count < config.sample_size;
+            col.ingest(value, should_infer);
+        }
+    }
+
+    for result in records {
         let record = result.context("failed to parse CSV record")?;
         row_count += 1;
 
@@ -396,11 +413,12 @@ pub fn profile_csv(path: &Path, config: ProfileConfig) -> anyhow::Result<Dataset
         }
 
         for (col, value) in columns.iter_mut().zip(record.iter()) {
-            col.ingest(value);
+            let should_infer = config.sample_size == 0 || col.sample_count < config.sample_size;
+            col.ingest(value, should_infer);
         }
     }
 
-    let reports = columns.into_iter().map(|state| state.finalize()).collect();
+    let reports: Vec<ColumnReport> = columns.into_iter().map(|state| state.finalize()).collect();
 
     Ok(DatasetReport {
         row_count,
