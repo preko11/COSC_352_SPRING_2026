@@ -7,9 +7,17 @@ use numeric::NumericProfiler;
 use categorical::CategoricalProfiler;
 pub use traits::ColumnProfiler;
 
-pub fn create_profiler(dtype: DataType) -> Box<dyn ColumnProfiler> {
-    match dtype {
-        DataType::Integer | DataType::Float => Box::new(NumericProfiler::new()),
-        _ => Box::new(CategoricalProfiler::new()),
+pub trait ProfilerFactory {
+    fn create(&self, dtype: &DataType) -> Box<dyn ColumnProfiler>;
+}
+
+pub struct TypeBasedProfilerFactory;
+
+impl ProfilerFactory for TypeBasedProfilerFactory {
+    fn create(&self, dtype: &DataType) -> Box<dyn ColumnProfiler> {
+        match dtype {
+            DataType::Integer | DataType::Float => Box::new(NumericProfiler::new()),
+            DataType::Text => Box::new(CategoricalProfiler::new()),
+        }
     }
 }

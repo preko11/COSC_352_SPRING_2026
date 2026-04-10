@@ -1,4 +1,4 @@
-use super::traits::ColumnProfiler;
+use super::traits::{ReportRenderer, ValueProfiler};
 
 pub struct NumericProfiler {
     count: usize,
@@ -22,7 +22,7 @@ impl NumericProfiler {
     }
 }
 
-impl ColumnProfiler for NumericProfiler {
+impl ValueProfiler for NumericProfiler {
     fn update(&mut self, value: &str) {
         if value.trim().is_empty() {
             self.nulls += 1;
@@ -47,7 +47,9 @@ impl ColumnProfiler for NumericProfiler {
     }
 
     fn finalize(&mut self) {}
+}
 
+impl ReportRenderer for NumericProfiler {
     fn report(&self) -> String {
         let variance = if self.count > 1 {
             self.m2 / (self.count as f64 - 1.0)

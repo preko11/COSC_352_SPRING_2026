@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use super::traits::ColumnProfiler;
+use super::traits::{ReportRenderer, ValueProfiler};
 
 pub struct CategoricalProfiler {
     counts: HashMap<String, usize>,
@@ -15,7 +15,7 @@ impl CategoricalProfiler {
     }
 }
 
-impl ColumnProfiler for CategoricalProfiler {
+impl ValueProfiler for CategoricalProfiler {
     fn update(&mut self, value: &str) {
         if value.trim().is_empty() {
             self.nulls += 1;
@@ -26,7 +26,9 @@ impl ColumnProfiler for CategoricalProfiler {
     }
 
     fn finalize(&mut self) {}
+}
 
+impl ReportRenderer for CategoricalProfiler {
     fn report(&self) -> String {
         let mut pairs: Vec<_> = self.counts.iter().collect();
         pairs.sort_by(|a, b| b.1.cmp(a.1));
