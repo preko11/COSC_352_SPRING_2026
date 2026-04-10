@@ -5,7 +5,7 @@ pub mod categorical;
 use crate::utils::DataType;
 use numeric::NumericProfiler;
 use categorical::CategoricalProfiler;
-use traits::ColumnProfiler;
+pub use traits::ColumnProfiler;
 
 pub fn create_profiler(dtype: DataType) -> Box<dyn ColumnProfiler> {
     match dtype {
@@ -13,5 +13,3 @@ pub fn create_profiler(dtype: DataType) -> Box<dyn ColumnProfiler> {
         _ => Box::new(CategoricalProfiler::new()),
     }
 }
-
-pub use traits::ColumnProfiler;

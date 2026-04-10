@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (i, profiler) in profilers.iter_mut().enumerate() {
         profiler.finalize();
 
-        println!("Column: {}", headers[i]);
+        println!("Column: {}", &headers[i]);
         println!("{}", profiler.report());
         println!("----------------------------------");
     }
