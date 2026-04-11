@@ -1,0 +1,26 @@
+id,name,age,salary,department,hired_date,active,score,notes
+1,Alice Johnson,32,95000.00,Engineering,2019-03-15,true,8.7,Top performer on backend team
+2,Bob Smith,45,110000.50,Engineering,2015-07-22,true,9.1,Lead architect
+3,Carol White,28,,Marketing,2021-01-10,false,6.2,On leave
+4,David Brown,51,87500.00,Sales,2012-11-30,true,7.8,
+5,Eva Martinez,35,92000.00,Engineering,2018-05-05,true,8.9,Full-stack developer
+6,Frank Lee,29,78000.00,Marketing,2020-08-18,true,7.1,Social media specialist
+7,Grace Kim,40,105000.00,Engineering,2016-02-14,true,9.3,ML researcher
+8,,33,62000.00,Sales,2022-03-01,false,5.5,Onboarding
+9,Henry Clark,60,130000.00,Management,2008-09-09,true,9.8,VP of Engineering
+10,Isabel Davis,27,71000.00,Marketing,2023-01-20,true,6.9,Junior copywriter
+11,James Wilson,38,98000.00,Engineering,2017-06-11,true,8.4,DevOps lead
+12,Karen Thomas,44,115000.00,Management,2013-04-25,true,9.0,Director of Sales
+13,Liam Moore,31,80000.00,Sales,2019-10-07,true,7.5,Account executive
+14,Mia Taylor,26,68000.00,Marketing,2022-07-15,false,6.0,Intern extended
+15,Noah Anderson,55,125000.00,Management,2010-12-01,true,9.6,CFO
+16,Olivia Jackson,34,90000.00,Engineering,2018-09-20,true,8.2,Security engineer
+17,Paul Harris,48,,Sales,2014-03-18,true,7.9,Senior account exec
+18,Quinn Martin,22,55000.00,Marketing,2023-06-01,true,5.8,New hire
+19,Rachel Thompson,39,102000.00,Engineering,2016-11-28,true,8.8,Data engineer
+20,Sam Garcia,36,88000.00,Sales,2018-02-14,true,7.3,Regional manager
+21,Tina Martinez,30,76000.00,Marketing,2020-05-09,true,7.0,Content strategist
+22,Uma Patel,43,108000.00,Engineering,2014-08-30,true,9.2,Platform engineer
+23,Victor Lee,57,135000.00,Management,2007-01-15,true,9.7,CEO
+24,Wendy Hall,29,72000.00,Sales,2021-09-22,false,6.4,Performance plan
+25,Xavier Young,33,85000.00,Engineering,2019-07-17,true,8.1,Cloud architect
