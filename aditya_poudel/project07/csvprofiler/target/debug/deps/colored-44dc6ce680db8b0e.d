@@ -1,0 +1,11 @@
+/Users/adi/Desktop/COSC_352_SPRING_2026/aditya_poudel/project07/csvprofiler/target/debug/deps/colored-44dc6ce680db8b0e.d: /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/lib.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/color.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/control.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/style.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/customcolors.rs
+
+/Users/adi/Desktop/COSC_352_SPRING_2026/aditya_poudel/project07/csvprofiler/target/debug/deps/libcolored-44dc6ce680db8b0e.rlib: /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/lib.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/color.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/control.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/style.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/customcolors.rs
+
+/Users/adi/Desktop/COSC_352_SPRING_2026/aditya_poudel/project07/csvprofiler/target/debug/deps/libcolored-44dc6ce680db8b0e.rmeta: /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/lib.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/color.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/control.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/style.rs /Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/customcolors.rs
+
+/Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/lib.rs:
+/Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/color.rs:
+/Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/control.rs:
+/Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/style.rs:
+/Users/adi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/colored-2.0.4/src/customcolors.rs:
