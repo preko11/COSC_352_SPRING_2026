@@ -1,11 +1,9 @@
-# Use the latest official Python image
-FROM python:3.11-slim
-# Set working directory inside container
-WORKDIR /app
-# Copy the Python file into the container
-COPY hello-world.py /app
-# Install dependencies if needed (uncomment if you have requirements.txt)
-# COPY requirements.txt
-# RUN pip install --no-cache-dir -r requirements.txt
-# Command to run the script
-ENTRYPOINT ["python", "hello-world.py"]
+FROM --platform=linux/amd64 rocker/shiny:latest
+
+RUN R -e "install.packages(c('shiny','dplyr','ggplot2'), repos='https://cloud.r-project.org/')"
+
+COPY . /srv/shiny-server/
+
+EXPOSE 3838
+
+CMD ["/init"]
