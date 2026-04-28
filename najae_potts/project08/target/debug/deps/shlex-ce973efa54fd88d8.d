@@ -1,0 +1,8 @@
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/shlex-ce973efa54fd88d8.d: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/bytes.rs
+
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/libshlex-ce973efa54fd88d8.rlib: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/bytes.rs
+
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/libshlex-ce973efa54fd88d8.rmeta: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/bytes.rs
+
+/home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/lib.rs:
+/home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/shlex-1.3.0/src/bytes.rs:

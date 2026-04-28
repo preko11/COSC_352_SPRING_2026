@@ -1,0 +1,8 @@
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/slab-92c09c412efc0832.d: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/builder.rs
+
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/libslab-92c09c412efc0832.rlib: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/builder.rs
+
+/workspaces/COSC_352_SPRING_2026/najae_potts/project08/target/debug/deps/libslab-92c09c412efc0832.rmeta: /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/lib.rs /home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/builder.rs
+
+/home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/lib.rs:
+/home/codespace/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.12/src/builder.rs:
